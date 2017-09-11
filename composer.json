@@ -1,0 +1,24 @@
+{
+    "name": "sift/practiceweb-connectivity-plugin",
+    "description": "Connectivity plugin for PracticeWEB services.",
+    "authors": [
+        {
+            "name": "David Robinson",
+            "email": "David.Robinson@practiceweb.co.uk"
+        }
+    ],
+    "require": {
+        "tgmpa/tgm-plugin-activation": "^2.6"
+    },
+    "autoload": {
+        "psr-4": {"Sift\\Practiceweb\\Connectivity\\" : "src/"}
+    },
+    "require-dev": {
+    },
+    "config": {
+        "preferred-install": {
+            "*": "dist"
+        }
+    },
+    "license": "proprietary"
+}
