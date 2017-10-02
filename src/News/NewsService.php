@@ -74,7 +74,7 @@ class NewsService extends ServiceAbstract
             'munge comments feed links' => 'no',
             'comment status' => 'closed',
             'ping status' => 'closed',
-            'syndicated post type' => 'post',
+            'syndicated post type' => 'news',
             'no robots' => 'yes',
             // Authors setting.
             'map authors' => array(
