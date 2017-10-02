@@ -8,7 +8,8 @@
         }
     ],
     "require": {
-        "tgmpa/tgm-plugin-activation": "^2.6"
+        "tgmpa/tgm-plugin-activation": "^2.6",
+        "jjgrainger/wp-custom-post-type-class": "dev-master"
     },
     "autoload": {
         "psr-4": {"Sift\\Practiceweb\\Connectivity\\" : "src/"}

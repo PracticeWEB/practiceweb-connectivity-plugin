@@ -2,6 +2,9 @@
 
 namespace Sift\Practiceweb\Connectivity;
 
+use Sift\Practiceweb\Connectivity\HookLoader;
+use Sift\Practiceweb\Connectivity\TemplateHandler;
+
 /**
  * Class ServiceAbstract.
  *
@@ -9,6 +12,13 @@ namespace Sift\Practiceweb\Connectivity;
  */
 abstract class ServiceAbstract
 {
+
+    /**
+     * Plugin file which registered the service.
+     *
+     * @var String
+     */
+    protected $pluginFile;
 
     /**
      * Hook loader.
@@ -32,12 +42,18 @@ abstract class ServiceAbstract
      * @param TemplateHandler $handler
      *   Template handler object.
      */
-    public function __construct(HookLoader $loader, TemplateHandler $handler)
+    public function __construct($pluginFile, HookLoader $loader, TemplateHandler $handler)
     {
+        $this->pluginFile = $pluginFile;
         $this->hookLoader = $loader;
         $this->templateHandler = $handler;
         $this->addFilters();
         $this->addActions();
+        $this->createPostTypes();
+        $this->addActivationHooks();
+        $this->addDeactivationHooks();
+        $this->addShortCodes();
+        $this->addWidgets();
     }
 
     /**
@@ -89,6 +105,27 @@ abstract class ServiceAbstract
     }
 
     /**
+     * Add activation hooks.
+     */
+    public function addActivationHooks()
+    {
+    }
+
+    /**
+     * Add deactivation hooks.
+     */
+    public function addDeactivationHooks()
+    {
+    }
+
+    /**
+     * Create any post types.
+     */
+    public function createPostTypes()
+    {
+    }
+
+    /**
      * Render a named template.
      *
      * @param string $name
@@ -99,5 +136,19 @@ abstract class ServiceAbstract
     public function renderTemplate($name, array $vars = array())
     {
         $this->templateHandler->processTemplate($name, $vars);
+    }
+
+    /**
+     * Add any shortcodes.
+     */
+    public function addShortcodes()
+    {
+    }
+
+    /**
+     * Add any widgets.
+     */
+    public function addWidgets()
+    {
     }
 }

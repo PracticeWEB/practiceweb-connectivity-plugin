@@ -24,11 +24,22 @@ class ComposerStaticInit7335bad536371cbf8a69ed66c032a764
         ),
     );
 
+    public static $prefixesPsr0 = array (
+        'C' => 
+        array (
+            'CPT' => 
+            array (
+                0 => __DIR__ . '/..' . '/jjgrainger/wp-custom-post-type-class/src',
+            ),
+        ),
+    );
+
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInit7335bad536371cbf8a69ed66c032a764::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInit7335bad536371cbf8a69ed66c032a764::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit7335bad536371cbf8a69ed66c032a764::$prefixesPsr0;
 
         }, null, ClassLoader::class);
     }

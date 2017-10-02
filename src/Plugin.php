@@ -84,7 +84,7 @@ class Plugin
      */
     public function registerService($name, $class)
     {
-        $service = new $class($this->hookLoader, $this->templateHandler);
+        $service = new $class(__FILE__, $this->hookLoader, $this->templateHandler);
         $this->registry[$name] = $service;
     }
 }

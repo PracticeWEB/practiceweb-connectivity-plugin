@@ -3,6 +3,8 @@
 namespace Sift\Practiceweb\Connectivity\AdminPage;
 
 use Sift\Practiceweb\Connectivity\ServiceAbstract;
+use Sift\Practiceweb\Connectivity\HookLoader;
+use Sift\Practiceweb\Connectivity\TemplateHandler;
 
 /**
  * Class AdminPageService.
