@@ -21,8 +21,13 @@ class FeedWordPressService extends ServiceAbstract
     {
         $this->addAction('tgmpa_register', 'registerPlugin');
         $this->addAction('wp_head', 'setNoRobots');
+        // No robots support.
         $this->addAction('feedwordpress_admin_page_posts_meta_boxes', 'addFeedRobotsMetabox');
         $this->addAction('feedwordpress_admin_page_posts_save', 'feedRobotsMetaboxSave', 10, 2);
+        // Attach APIKey support.
+        $this->addAction('feedwordpress_admin_page_feeds_meta_boxes', 'addFeedAPIKeyMetabox');
+        $this->addAction('feedwordpress_admin_page_feeds_save', 'feedAPIKeyMetaboxSave', 10, 2);
+        // Callback for fetching a feed.
         $this->addAction('practiceweb_feed_fetch', 'feedFetch');
     }
 
@@ -136,6 +141,64 @@ class FeedWordPressService extends ServiceAbstract
         }
     }
 
+    /**
+     * Adds a metabox to the feed word press config for APIKey usage.
+     *
+     * @param \FeedWordPressAdminPage $page
+     *   FWP page object.
+     */
+    public function addFeedAPIKeyMetabox(\FeedWordPressAdminPage $page)
+    {
+        add_meta_box(
+            'page',
+            'Include APIKey',
+            array($this, 'feedAPIKeyMetabox'),
+            $page->meta_box_context(),
+            $page->meta_box_context()
+        );
+    }
+
+    /**
+     * Render the metabox for APIkey.
+     *
+     * @param \FeedWordPressAdminPage $page
+     *   FeedWordpress page.
+     * @param mixed $box
+     *   Meta Box info.
+     */
+    public function feedApiKeyMetabox(\FeedWordPressAdminPage $page, $box = null)
+    {
+        if ($page->for_feed_settings()) {
+            $vars = array();
+            // Get our current setting.
+            $setting = $page->link->setting('practiceweb apiKey', null, null, 'no');
+            $vars['checked'] = array();
+            $vars['checked']['practicewebApiKey']['yes'] = $setting == 'yes' ? 'checked=checked' : '';
+            $vars['checked']['practicewebApiKey']['no'] = $setting == 'no' ? 'checked=checked' : '';
+            $this->renderTemplate('feedwordpress/apikey-metabox-feed-settings', $vars);
+        } else {
+            $this->renderTemplate('feedwordpress/apikey-global-settings');
+        }
+    }
+
+    /**
+     * Save the key settings from the metabox.
+     *
+     * @param array $params
+     *   Array of saved data.
+     * @param \FeedWordPressAdminPage $page
+     *   FeedWordpress page.
+     */
+    public function feedAPIKeyMetaboxSave(array $params, \FeedWordPressAdminPage $page)
+    {
+        if (isset($params['save']) or isset($params['submit'])) {
+            if ($page->for_feed_settings()) {
+                $page->link->settings['practiceweb apiKey'] = $params['practicewebApiKey'];
+                $page->link->save_settings(true);
+            }
+        }
+    }
+
      /**
      * Filter to add APIKey to a feed link.
      *
@@ -151,10 +214,9 @@ class FeedWordPressService extends ServiceAbstract
      */
     public function addFeedParameters($params = array(), $uri = '', \SyndicatedLink $link = null)
     {
-        // TODO refactoer to a link flag
-        // Is this our link?
-        $feedLinkId = get_option('practiceweb-connectivity-newsfeed-link_id', null);
-        if ($link->id === $feedLinkId) {
+        // Get APIKEY option
+        $addKey = $link->settings['practiceweb apiKey'];
+        if ($addKey == 'yes') {
             $config = get_option('practiceweb-connectivity-config', array());
             $apiKey = $config['apiKey'];
             if ($apiKey) {

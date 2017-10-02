@@ -10,7 +10,7 @@ use CPT;
 
 
 /**
- * Class NewssService.
+ * Class NewsService.
  *
  * @package Sift\Practiceweb\Connectivity\News
  */
@@ -87,6 +87,8 @@ class NewsService extends ServiceAbstract
             'add/category' => 'yes',
             'unfamiliar category' => 'create:category',
             'match/cats' => array('category'),
+            // Add Key.
+            'practiceweb apiKey' => 'yes'
         );
         $linkId = \FeedWordPress::syndicate_link('PracticeWEB News Feed', 'www.practiceweb.co.uk', $rssUrl);
         // Load the link.
