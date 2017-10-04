@@ -4,6 +4,7 @@ namespace Sift\Practiceweb\Connectivity\News;
 
 use \ET_Builder_Module_Blog;
 use \ET_Builder_Element;
+use \WP_Query;
 
 /**
  * Class PracticewebNewsModule
