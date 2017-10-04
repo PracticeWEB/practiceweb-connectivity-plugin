@@ -163,7 +163,7 @@ class NewsService extends ServiceAbstract
                     $feedLinkId = $this->createNewsFeed($uri);
                 }
                 if ($data['fetch'] == 'yes') {
-                    wp_schedule_single_event(time(), 'practiceweb_feed_fetch', $feedLinkId);
+                    wp_schedule_single_event(time(), 'practiceweb_feed_fetch', array($feedLinkId));
                 }
             }
             wp_redirect(admin_url('admin.php?page=feed-configuration'));
