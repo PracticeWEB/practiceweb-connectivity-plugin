@@ -38,9 +38,21 @@ class NewsService extends ServiceAbstract
         $postOptions = array(
             'has_archive' => true,
         );
+        $taxonomyNames = array(
+            'taxonomy_name' => 'PracticeWEB Content',
+            'singular' => 'Category',
+            'plural' => 'Categories',
+            'slug' => 'practiceweb-taxonomy',
+        );
+        $taxonomyOptions = array(
+
+        );
+
         // Just making a CPT instance triggers all we need.
         $news = new \CPT($postNames, $postOptions);
-        // TODO add taxonomy.
+        // Add taxonomy.
+        $news->register_taxonomy($taxonomyNames, $taxonomyOptions);
+
         // Use a closure to register a flush on activation.
         register_activation_hook($this->pluginFile, function () {
             $news->flush();
@@ -84,9 +96,9 @@ class NewsService extends ServiceAbstract
                 ),
             ),
             // Category settings.
-            'add/category' => 'yes',
-            'unfamiliar category' => 'create:category',
-            'match/cats' => array('category'),
+            'add/PracticeWEB Content' => 'yes',
+            'unfamiliar category' => 'create:PracticeWEB Content',
+            'match/cats' => array('PracticeWEB Content'),
             // Add Key.
             'practiceweb apiKey' => 'yes'
         );

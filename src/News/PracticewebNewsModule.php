@@ -18,6 +18,7 @@ class PracticewebNewsModule extends ET_Builder_Module_Blog {
         parent::init();
         $this->name = esc_html__('Practiceweb News', 'practiceweb');
         $this->slug = 'et_pb_pw_news';
+        // Enabling this appears to break the visual builder.
         $this->fb_support = false;
     }
 
