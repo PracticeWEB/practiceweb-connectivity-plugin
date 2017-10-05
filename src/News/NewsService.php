@@ -178,7 +178,7 @@ class NewsService extends ServiceAbstract
                     wp_schedule_single_event(time(), 'practiceweb_feed_fetch', array($feedLinkId));
                 }
             }
-            wp_redirect(admin_url('admin.php?page=feed-configuration'));
+            wp_redirect(admin_url('admin.php?page=news-configuration'));
         } else {
             wp_die('Action not permitted.', 403);
         }

@@ -34,6 +34,7 @@ class DeadlinesService extends ServiceAbstract
         );
         $postOptions = array(
             'has_archive' => true,
+            'supports' => array('title', 'editor', 'excerpt', 'custom-fields'),
         );
         $taxonomyNames = array(
             'taxonomy_name' => 'PracticeWEBContent',
@@ -42,7 +43,6 @@ class DeadlinesService extends ServiceAbstract
             'slug' => 'practiceweb-taxonomy',
         );
         $taxonomyOptions = array(
-
         );
 
         // Just making a CPT instance triggers all we need.
@@ -120,7 +120,7 @@ class DeadlinesService extends ServiceAbstract
                     wp_schedule_single_event(time(), 'practiceweb_feed_fetch', array($feedLinkId));
                 }
             }
-            wp_redirect(admin_url('admin.php?page=feed-configuration'));
+            wp_redirect(admin_url('admin.php?page=deadlines-configuration'));
         } else {
             wp_die('Action not permitted.', 403);
         }
@@ -136,7 +136,7 @@ class DeadlinesService extends ServiceAbstract
      * @return int
      *   The fwp link id.
      */
-    public function createNewsFeed($rssUrl)
+    public function createDeadlinesFeed($rssUrl)
     {
         $feedSettings = array(
             // Feeds section.

@@ -1,4 +1,4 @@
-<h2>Setup your Practiceweb News Feed</h2>
+<h2>Setup your Practiceweb Deadlines Feed</h2>
 <?php if ($vars['noKey']) { ?>
 <p>
     You don't appear to have added your api Key. Your feed will not work until this is added.
