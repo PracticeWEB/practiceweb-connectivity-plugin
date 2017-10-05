@@ -44,6 +44,7 @@ function launch_practiceweb_connectivity_plugin()
     $serviceMap = array(
       'fwp' =>  Sift\Practiceweb\Connectivity\FeedWordPress\FeedWordPressService::class,
       'news' =>  Sift\Practiceweb\Connectivity\News\NewsService::class,
+      'deadlines' =>  Sift\Practiceweb\Connectivity\Deadlines\DeadlinesService::class,
     );
 
     foreach ($serviceMap as $key =>$class) {

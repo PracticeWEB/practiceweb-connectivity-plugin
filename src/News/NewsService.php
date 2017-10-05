@@ -23,7 +23,7 @@ class NewsService extends ServiceAbstract
     public function addActions()
     {
         $this->addAction('practiceweb_connectivity_admin_menu', 'adminPageMenu');
-        $this->addAction('admin_post_practiceweb_connectivity_feed_setup', 'setupPageSubmit');
+        $this->addAction('admin_post_practiceweb_connectivity_news_setup', 'setupPageSubmit');
         $this->addAction('et_builder_ready', 'registerDiviModules');
     }
 
@@ -39,9 +39,9 @@ class NewsService extends ServiceAbstract
             'has_archive' => true,
         );
         $taxonomyNames = array(
-            'taxonomy_name' => 'PracticeWEB Content',
-            'singular' => 'Category',
-            'plural' => 'Categories',
+            'taxonomy_name' => 'PracticeWEBContent',
+            'singular' => 'PracticeWEB Category',
+            'plural' => 'PracticeWEB Categories',
             'slug' => 'practiceweb-taxonomy',
         );
         $taxonomyOptions = array(
@@ -97,8 +97,8 @@ class NewsService extends ServiceAbstract
             ),
             // Category settings.
             'add/PracticeWEB Content' => 'yes',
-            'unfamiliar category' => 'create:PracticeWEB Content',
-            'match/cats' => array('PracticeWEB Content'),
+            'unfamiliar category' => 'create:PracticeWEBContent',
+            'match/cats' => array('PracticeWEBContent'),
             // Add Key.
             'practiceweb apiKey' => 'yes'
         );
@@ -121,10 +121,10 @@ class NewsService extends ServiceAbstract
     {
         add_submenu_page(
             'practiceweb-connectivity',
-            'Feed Configuration',
-            'Feed Configuration',
+            'News Configuration',
+            'News Configuration',
             'manage_options',
-            'feed-configuration',
+            'news-configuration',
             array($this, 'setupPage')
         );
     }
@@ -145,7 +145,7 @@ class NewsService extends ServiceAbstract
                 // Use the base link before any filters are applied.
                 $vars['uri'] = $feedLink->link->link_rss;
             }
-            $this->renderTemplate('feedwordpress/feed-setup', $vars);
+            $this->renderTemplate('news/feed-setup', $vars);
         } else {
             // TODO can we interrogate TGMA.
             $this->renderTemplate('feedwordpress/fwp-not-enabled');
@@ -159,7 +159,7 @@ class NewsService extends ServiceAbstract
     {
         $data = $_REQUEST;
         // Confirm capability and nonce.
-        $validNonce = wp_verify_nonce($data['_wpnonce'], 'practiceweb_connectivity_feed_setup');
+        $validNonce = wp_verify_nonce($data['_wpnonce'], 'practiceweb_connectivity_news_setup');
         if (current_user_can('manage_options') && $validNonce) {
             $uri = sanitize_text_field($data['uri']);
             if ($uri) {
@@ -186,6 +186,7 @@ class NewsService extends ServiceAbstract
 
     public function registerDiviModules() {
         new PracticewebNewsModule();
+        new PracticewebNewsPortfolio();
     }
 
     public function addShortcodes()
