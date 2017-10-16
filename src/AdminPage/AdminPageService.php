@@ -74,7 +74,6 @@ class AdminPageService extends ServiceAbstract
      */
     public function sanitizeInput(array $input)
     {
-        print_r($input);
         $input['apiKey'] = sanitize_text_field($input['apiKey']);
         return $input;
     }

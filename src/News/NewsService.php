@@ -96,7 +96,7 @@ class NewsService extends ServiceAbstract
                 ),
             ),
             // Category settings.
-            'add/PracticeWEB Content' => 'yes',
+            'add/PracticeWEBContent' => 'yes',
             'unfamiliar category' => 'create:PracticeWEBContent',
             'match/cats' => array('PracticeWEBContent'),
             // Add Key.

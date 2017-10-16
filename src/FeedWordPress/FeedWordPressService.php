@@ -150,7 +150,7 @@ class FeedWordPressService extends ServiceAbstract
     public function addFeedAPIKeyMetabox(\FeedWordPressAdminPage $page)
     {
         add_meta_box(
-            'page',
+            'apikey',
             'Include APIKey',
             array($this, 'feedAPIKeyMetabox'),
             $page->meta_box_context(),

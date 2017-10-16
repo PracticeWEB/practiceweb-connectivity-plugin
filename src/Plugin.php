@@ -35,6 +35,12 @@ class Plugin
      */
     protected $pluginRoot;
     /**
+     * plugin file.
+     *
+     * @var string
+     */
+    protected $pluginFile;
+    /**
      * Registry to hold services added.
      *
      * @var array
@@ -47,12 +53,13 @@ class Plugin
      * @param string $pluginRoot
      *   Base path this plugin lives in.
      */
-    public function __construct($pluginRoot)
+    public function __construct($pluginRoot, $pluginFile)
     {
         $this->version = '1.0.0';
         $this->hookLoader = new HookLoader();
         $this->templateHandler = new TemplateHandler($pluginRoot);
         $this->pluginRoot = $pluginRoot;
+        $this->pluginFile = $pluginFile;
     }
 
     /**
@@ -84,7 +91,7 @@ class Plugin
      */
     public function registerService($name, $class)
     {
-        $service = new $class(__FILE__, $this->hookLoader, $this->templateHandler);
+        $service = new $class($this->pluginFile, $this->hookLoader, $this->templateHandler);
         $this->registry[$name] = $service;
     }
 }

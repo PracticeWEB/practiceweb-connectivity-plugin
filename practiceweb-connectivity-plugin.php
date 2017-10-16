@@ -35,7 +35,7 @@ require __DIR__ . '/vendor/autoload.php';
  */
 function launch_practiceweb_connectivity_plugin()
 {
-    $plugin = new Plugin(plugin_dir_path(__FILE__));
+    $plugin = new Plugin(plugin_dir_path(__FILE__), __FILE__);
     // Register services
     // Admin page is required as a core service.
     $plugin->registerService('adminpage', Sift\Practiceweb\Connectivity\AdminPage\AdminPageService::class);

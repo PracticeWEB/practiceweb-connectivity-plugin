@@ -6,6 +6,9 @@ use Sift\Practiceweb\Connectivity\ServiceAbstract;
 use Sift\Practiceweb\Connectivity\HookLoader;
 use Sift\Practiceweb\Connectivity\TemplateHandler;
 
+use DateTimeImmutable;
+use DateInterval;
+
 /**
  * Class FeedWordPressService.
  *
@@ -21,12 +24,18 @@ class DeadlinesService extends ServiceAbstract
     {
         $this->addAction('practiceweb_connectivity_admin_menu', 'adminPageMenu');
         $this->addAction('admin_post_practiceweb_connectivity_deadlines_setup', 'setupPageSubmit');
+        $this->addAction('admin_post_practiceweb_connectivity_deadlines_upload', 'uploadPageSubmit');
         //$this->addAction('et_builder_ready', 'registerDiviModules');
+        $this->addAction('wp_enqueue_scripts', 'registerScripts');
+        $this->addAction('admin_notices', 'showAdminNotices');
     }
 
+    /**
+     * Create deadlines post type and taxonomy.
+     */
     public function createPostTypes()
     {
-        $postNames= array(
+        $postNames = array(
             'post_type_name' => 'deadlines',
             'singluar' => 'Deadline',
             'plural' => 'Dates and deadlines',
@@ -42,8 +51,7 @@ class DeadlinesService extends ServiceAbstract
             'plural' => 'PracticeWEB Categories',
             'slug' => 'practiceweb-taxonomy',
         );
-        $taxonomyOptions = array(
-        );
+        $taxonomyOptions = array();
 
         // Just making a CPT instance triggers all we need.
         $deadlines = new \CPT($postNames, $postOptions);
@@ -61,6 +69,8 @@ class DeadlinesService extends ServiceAbstract
      */
     public function adminPageMenu()
     {
+        // FEED based config is disabled for now.
+        /*
         add_submenu_page(
             'practiceweb-connectivity',
             'Deadlines Configuration',
@@ -68,6 +78,15 @@ class DeadlinesService extends ServiceAbstract
             'manage_options',
             'deadlines-configuration',
             array($this, 'setupPage')
+        );
+        */
+        add_submenu_page(
+            'practiceweb-connectivity',
+            'Deadlines Upload',
+            'Deadlines Upload',
+            'manage_options',
+            'deadlines-upload',
+            array($this, 'uploadPage')
         );
     }
 
@@ -185,4 +204,251 @@ class DeadlinesService extends ServiceAbstract
         return $linkId;
     }
 
+    public function addShortcodes()
+    {
+        add_shortcode('practiceweb-deadlines', array($this, 'shortcode'));
+    }
+
+    public function shortcode()
+    {
+        wp_enqueue_script('pw-deadlines');
+
+        // Wordpress has no abstraction.
+        $taxonomy = isset($_REQUEST['taxonomy']) ? $_REQUEST['taxonomy'] : array();
+
+        // Get filters
+        $filter = '';
+        $html = '<div class="deadlines-container">';
+
+
+        $dates = array(
+            'all' => 'All',
+            'thisweek' => 'This Week',
+            'next2weeks' => 'Next 2 weeks',
+            'thismonth' => 'This Month',
+            'next2months' => 'Next 2 Months',
+            'thisquarter' => 'This Quarter',
+            'next2quarters' => 'Next 2 Quarters',
+            'thisyear' => 'This Year',
+            'next2years' => 'Next 2 Years',
+        );
+
+        $dateRange = 'all';
+        if (isset($_REQUEST['dateRange']) && isset($dates[$_REQUEST['dateRange']])) {
+            $dateRange = $_REQUEST['dateRange'];
+        }
+        $filter .= '<div class="deadlines-filters"><form><fieldset>';
+        $filter.= '<select name="dateRange">';
+        foreach ($dates as $key => $label) {
+            $selected = $dateRange == $key ? 'selected' : '';
+            $filter.= sprintf('<option value="%s" %s>%s</option>', $key, $selected, $label);
+        }
+        $filter.= '</select>';
+        $filter .= '</fieldset>';
+
+
+        $terms = get_terms(array(
+            'taxonomy' => 'PracticeWEBContent',
+            'hide_empty' => true,
+        ));
+        // $html.= "<xmp>".print_r($terms, TRUE)."</xmp>";
+
+        $filter .= '<fieldset>';
+        foreach ($terms as $term) {
+            $checked = (in_array($term->term_id, $taxonomy)) ? 'checked' : '';
+            $filter .= sprintf('<input type="checkbox" name="taxonomy" value="%d" %s> %s', $term->term_id, $checked, $term->name);
+        }
+        $filter .= '</fieldset>';
+
+
+        $filter .= '<input class="deadlines-apply-filter" type="button" value="Apply">';
+        $filter .= '</form></div>';
+
+        $html .= $filter;
+
+        $queryArgs = array(
+            'dateRange' => $dateRange,
+            'taxonomy' => $taxonomy,
+        );
+        //$html .= "<xmp>".print_r($queryArgs, TRUE). "</xmp>";
+        $query = $this->query($queryArgs);
+        global $post;
+        $current_date = null;
+        $html .= '<div class="deadlines-list-container"><dl class="deadlines-list">';
+        while ($query->have_posts()) {
+            $query->the_post();
+            $meta = get_post_meta($post->ID);
+            $showDate = false;
+            if ($current_date !== $meta['deadlineDate'][0]) {
+                $current_date = $meta['deadlineDate'][0];
+                $showDate = true;
+            }
+            //  echo "<xmp>". print_r($post, TRUE) . "</xmp>";
+            //   echo "<xmp>". print_r($meta, TRUE) . "</xmp>";
+            if ($showDate) {
+                $html .= "<dt><h2>{$meta['deadlineDate'][0]}</h2></dt>";
+            }
+            $html .= "<dd>";
+            $html .= "<h3>{$post->post_title}</h3>";
+            $html .= "<blockquote>{$post->post_excerpt}</blockquote>";
+            $html .= '</dd>';
+        }
+        $html .= "</dl></div>";
+        $html .= "</div>";
+        wp_reset_postdata();
+        return $html;
+    }
+
+
+    public function query($args = array())
+    {
+        $queryArgs = array(
+            'post_type' => 'deadlines',
+            'post_status' => array('publish'),
+            'posts_per_page' => -1,
+            'paged' => 1,
+            'meta_key' => 'deadlineDate',
+            'orderby' => 'meta_value',
+            'order' => 'ASC'
+        );
+        // Date range for query.
+        if (isset($args['dateRange'])) {
+            $dateBegin = '1970-01-01';
+            $dateEnd = '2030-12-12';
+            $now = new DateTimeImmutable();
+            $dateFormat = 'Y-m-d';
+            switch ($args['dateRange']) {
+                case 'today' :
+                    $dateBegin = $now->format($dateFormat);
+                    $dateEnd = $now->format($dateFormat);
+                    break;
+                case 'thisweek' :
+                    $dateBegin = $now->format($dateFormat);
+                    $end = $now->add(new DateInterval('P1W'));
+                    $dateEnd = $end->format($dateFormat);
+                    break;
+                case 'next2weeks' :
+                    $dateBegin = $now->format($dateFormat);
+                    $end = $now->add(new DateInterval('P2W'));
+                    $dateEnd = $end->format($dateFormat);
+                    break;
+                case 'thismonth' :
+                    $dateBegin = $now->format($dateFormat);
+                    $end = $now->add(new DateInterval('P1M'));
+                    $dateEnd = $end->format($dateFormat);
+                    break;
+                case 'next2months' :
+                    $dateBegin = $now->format($dateFormat);
+                    $end = $now->add(new DateInterval('P2M'));
+                    $dateEnd = $end->format($dateFormat);
+                    break;
+                case 'thisquarter' :
+                    $dateBegin = $now->format($dateFormat);
+                    $end = $now->add(new DateInterval('P3M'));
+                    $dateEnd = $end->format($dateFormat);
+                    break;
+                case 'next2quarters' :
+                    $dateBegin = $now->format($dateFormat);
+                    $end = $now->add(new DateInterval('P6M'));
+                    $dateEnd = $end->format($dateFormat);
+                    break;
+                case 'thisyear' :
+                    $dateBegin = $now->format($dateFormat);
+                    $end = $now->add(new DateInterval('P1Y'));
+                    $dateEnd = $end->format($dateFormat);
+                    break;
+                case 'next2years':
+                    $dateBegin = $now->format($dateFormat);
+                    $end = $now->add(new DateInterval('P2Y'));
+                    $dateEnd = $end->format($dateFormat);
+                    break;
+                case 'lastweek':
+                    $start = $now->sub(new DateInterval('P1W'));
+                    $dateBegin = $start->format($dateFormat);
+                    $dateEnd = $now->format($dateFormat);
+                    break;
+            }
+            $queryArgs['meta_query'] = array(
+                array(
+                    'key' => 'deadlineDate',
+                    'value' => array($dateBegin, $dateEnd),
+                    'compare' => 'BETWEEN',
+                    'type' => 'DATE',
+                ),
+            );
+        }
+        // Taxonomy query.
+        if (isset($args['taxonomy']) && ! empty($args['taxonomy'])) {
+            $queryArgs['tax_query'][] = array(
+                'taxonomy' => 'PracticeWEBContent',
+                'field' => 'term_id',
+                'terms' => array_values($args['taxonomy']),
+            );
+        }
+        $query = new \WP_Query($queryArgs);
+        return $query;
+    }
+
+    public function registerScripts() {
+        $jsPath = plugin_dir_url($this->pluginFile) . '/js/deadlines.js';
+        wp_register_script('pw-deadlines', $jsPath, array('jquery'), '1.0.0', TRUE );
+    }
+
+    public function uploadPage() {
+        $vars = array();
+        $this->renderTemplate('deadlines/upload', $vars);
+    }
+
+    public function uploadPageSubmit()
+    {
+        // TODO verify
+        $uploaded = $_FILES['deadlinesfile'];
+        $fh = fopen($uploaded['tmp_name'], 'r');
+        // Assume that first line is header
+        $header = fgetcsv($fh);
+        while ($row = fgetcsv($fh)) {
+            list($title, $uuid, $deadlineDate, $content, $teaser, $termsString, $guid) = $row;
+            $terms = array_unique(array_map('trim', explode(',', $termsString)));
+            $post_info = array(
+                'post_type' => 'deadlines',
+                'post_title' => $title,
+                'post_content' => $content,
+                'post_excerpt' => $teaser,
+                'post_status' => 'publish',
+                'guid' => $guid,
+                'meta_input' => array(
+                    'deadlineDate' => $deadlineDate,
+                ),
+            );
+
+            global $wpdb;
+            // Detect existing GUID.
+            $query = $wpdb->prepare("SELECT ID FROM $wpdb->posts WHERE post_type='%s' AND guid = '%s'", array('deadlines', $guid));
+            $postId = $wpdb->get_var($query);
+            if ($postId) {
+                $post_info['ID'] = $postId;
+            }
+            $postId = wp_insert_post($post_info);
+            if($postId) {
+                // Use wp_set_object_terms so that we can create new terms on demand.
+                wp_set_object_terms($postId, $terms, 'PracticeWEBContent');
+            }
+        }
+        $messageKey = get_current_user_id() . '_pwdeadlines';
+        set_transient($messageKey, 'Uploaded deadlines data.');
+        wp_redirect(admin_url('admin.php?page=deadlines-upload'));
+
+    }
+
+    function showAdminNotices() {
+        // Get transients
+        $messageKey = get_current_user_id() . '_pwdeadlines';
+        $message = get_transient($messageKey);
+        if ($message) {
+            delete_transient($messageKey);
+            $html = '<div class="notice notice-success is-dismissible"><p>%s</p></div>';
+            $html = sprintf($html, $message);
+            echo $html;
+        }
+    }
 }
