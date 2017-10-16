@@ -52,6 +52,8 @@ class Plugin
      *
      * @param string $pluginRoot
      *   Base path this plugin lives in.
+     * @param string $pluginFile
+     *   Plugin file path.
      */
     public function __construct($pluginRoot, $pluginFile)
     {

@@ -37,6 +37,8 @@ abstract class ServiceAbstract
     /**
      * Service constructor.
      *
+     * @param string $pluginFile
+     *   Plugin path.
      * @param HookLoader $loader
      *   Hook loader object.
      * @param TemplateHandler $handler

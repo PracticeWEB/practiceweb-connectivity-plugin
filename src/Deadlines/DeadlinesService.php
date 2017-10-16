@@ -204,11 +204,19 @@ class DeadlinesService extends ServiceAbstract
         return $linkId;
     }
 
+    /**
+     * Add shortcodes.
+     */
     public function addShortcodes()
     {
         add_shortcode('practiceweb-deadlines', array($this, 'shortcode'));
     }
 
+    /**
+     * Shortcode for deadlines.
+     *
+     * @return string
+     */
     public function shortcode()
     {
         wp_enqueue_script('pw-deadlines');
@@ -256,7 +264,8 @@ class DeadlinesService extends ServiceAbstract
         $filter .= '<fieldset>';
         foreach ($terms as $term) {
             $checked = (in_array($term->term_id, $taxonomy)) ? 'checked' : '';
-            $filter .= sprintf('<input type="checkbox" name="taxonomy" value="%d" %s> %s', $term->term_id, $checked, $term->name);
+            $inputTemplate = '<input type="checkbox" name="taxonomy" value="%d" %s> %s';
+            $filter .= sprintf($inputTemplate, $term->term_id, $checked, $term->name);
         }
         $filter .= '</fieldset>';
 
@@ -273,14 +282,14 @@ class DeadlinesService extends ServiceAbstract
         //$html .= "<xmp>".print_r($queryArgs, TRUE). "</xmp>";
         $query = $this->query($queryArgs);
         global $post;
-        $current_date = null;
+        $currentDate = null;
         $html .= '<div class="deadlines-list-container"><dl class="deadlines-list">';
         while ($query->have_posts()) {
             $query->the_post();
             $meta = get_post_meta($post->ID);
             $showDate = false;
-            if ($current_date !== $meta['deadlineDate'][0]) {
-                $current_date = $meta['deadlineDate'][0];
+            if ($currentDate !== $meta['deadlineDate'][0]) {
+                $currentDate = $meta['deadlineDate'][0];
                 $showDate = true;
             }
             //  echo "<xmp>". print_r($post, TRUE) . "</xmp>";
@@ -299,7 +308,15 @@ class DeadlinesService extends ServiceAbstract
         return $html;
     }
 
-
+    /**
+     * Helper to build the Wordpress query.
+     *
+     * @param array $args
+     *   Array of arguments to use.
+     *
+     * @return \WP_Query
+     *   Wordpress Query object.
+     */
     public function query($args = array())
     {
         $queryArgs = array(
@@ -318,41 +335,41 @@ class DeadlinesService extends ServiceAbstract
             $now = new DateTimeImmutable();
             $dateFormat = 'Y-m-d';
             switch ($args['dateRange']) {
-                case 'today' :
+                case 'today':
                     $dateBegin = $now->format($dateFormat);
                     $dateEnd = $now->format($dateFormat);
                     break;
-                case 'thisweek' :
+                case 'thisweek':
                     $dateBegin = $now->format($dateFormat);
                     $end = $now->add(new DateInterval('P1W'));
                     $dateEnd = $end->format($dateFormat);
                     break;
-                case 'next2weeks' :
+                case 'next2weeks':
                     $dateBegin = $now->format($dateFormat);
                     $end = $now->add(new DateInterval('P2W'));
                     $dateEnd = $end->format($dateFormat);
                     break;
-                case 'thismonth' :
+                case 'thismonth':
                     $dateBegin = $now->format($dateFormat);
                     $end = $now->add(new DateInterval('P1M'));
                     $dateEnd = $end->format($dateFormat);
                     break;
-                case 'next2months' :
+                case 'next2months':
                     $dateBegin = $now->format($dateFormat);
                     $end = $now->add(new DateInterval('P2M'));
                     $dateEnd = $end->format($dateFormat);
                     break;
-                case 'thisquarter' :
+                case 'thisquarter':
                     $dateBegin = $now->format($dateFormat);
                     $end = $now->add(new DateInterval('P3M'));
                     $dateEnd = $end->format($dateFormat);
                     break;
-                case 'next2quarters' :
+                case 'next2quarters':
                     $dateBegin = $now->format($dateFormat);
                     $end = $now->add(new DateInterval('P6M'));
                     $dateEnd = $end->format($dateFormat);
                     break;
-                case 'thisyear' :
+                case 'thisyear':
                     $dateBegin = $now->format($dateFormat);
                     $end = $now->add(new DateInterval('P1Y'));
                     $dateEnd = $end->format($dateFormat);
@@ -389,16 +406,27 @@ class DeadlinesService extends ServiceAbstract
         return $query;
     }
 
-    public function registerScripts() {
+    /**
+     * Register javascript.
+     */
+    public function registerScripts()
+    {
         $jsPath = plugin_dir_url($this->pluginFile) . '/js/deadlines.js';
-        wp_register_script('pw-deadlines', $jsPath, array('jquery'), '1.0.0', TRUE );
+        wp_register_script('pw-deadlines', $jsPath, array('jquery'), '1.0.0', true);
     }
 
-    public function uploadPage() {
+    /**
+     * Page view for upload.
+     */
+    public function uploadPage()
+    {
         $vars = array();
         $this->renderTemplate('deadlines/upload', $vars);
     }
 
+    /**
+     * Submit handler for upload page.
+     */
     public function uploadPageSubmit()
     {
         // TODO verify
@@ -409,7 +437,7 @@ class DeadlinesService extends ServiceAbstract
         while ($row = fgetcsv($fh)) {
             list($title, $uuid, $deadlineDate, $content, $teaser, $termsString, $guid) = $row;
             $terms = array_unique(array_map('trim', explode(',', $termsString)));
-            $post_info = array(
+            $postInfo = array(
                 'post_type' => 'deadlines',
                 'post_title' => $title,
                 'post_content' => $content,
@@ -423,13 +451,14 @@ class DeadlinesService extends ServiceAbstract
 
             global $wpdb;
             // Detect existing GUID.
-            $query = $wpdb->prepare("SELECT ID FROM $wpdb->posts WHERE post_type='%s' AND guid = '%s'", array('deadlines', $guid));
+            $queryString = "SELECT ID FROM $wpdb->posts WHERE post_type='%s' AND guid = '%s'";
+            $query = $wpdb->prepare($queryString, array('deadlines', $guid));
             $postId = $wpdb->get_var($query);
             if ($postId) {
-                $post_info['ID'] = $postId;
+                $postInfo['ID'] = $postId;
             }
-            $postId = wp_insert_post($post_info);
-            if($postId) {
+            $postId = wp_insert_post($postInfo);
+            if ($postId) {
                 // Use wp_set_object_terms so that we can create new terms on demand.
                 wp_set_object_terms($postId, $terms, 'PracticeWEBContent');
             }
@@ -437,10 +466,13 @@ class DeadlinesService extends ServiceAbstract
         $messageKey = get_current_user_id() . '_pwdeadlines';
         set_transient($messageKey, 'Uploaded deadlines data.');
         wp_redirect(admin_url('admin.php?page=deadlines-upload'));
-
     }
 
-    function showAdminNotices() {
+    /**
+     * Helper to use transients as admin notices.
+     */
+    public function showAdminNotices()
+    {
         // Get transients
         $messageKey = get_current_user_id() . '_pwdeadlines';
         $message = get_transient($messageKey);

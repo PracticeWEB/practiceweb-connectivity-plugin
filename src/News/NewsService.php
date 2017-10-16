@@ -7,8 +7,6 @@ use Sift\Practiceweb\Connectivity\HookLoader;
 use Sift\Practiceweb\Connectivity\TemplateHandler;
 use CPT;
 
-
-
 /**
  * Class NewsService.
  *
@@ -184,16 +182,29 @@ class NewsService extends ServiceAbstract
         }
     }
 
-    public function registerDiviModules() {
+    /**
+     * Register divi Modules.
+     */
+    public function registerDiviModules()
+    {
         new PracticewebNewsModule();
         new PracticewebNewsPortfolio();
     }
 
+    /**
+     * Add shortcodes.
+     */
     public function addShortcodes()
     {
         add_shortcode('practiceweb-news', array($this, 'newsShortcode'));
     }
 
+    /**
+     * Simple news shortcode.
+     *
+     * @param array $atts
+     *   Shortcode attributes array.
+     */
     public function newsShortcode($atts = array())
     {
         $query = $this->newsQuery();
@@ -214,6 +225,12 @@ class NewsService extends ServiceAbstract
         $this->renderTemplate('news/list-footer', $footerArgs);
     }
 
+    /**
+     * Helper to create a wordpress query.
+     *
+     * @return \WP_Query
+     *   Wordpress query object.
+     */
     public function newsQuery()
     {
         $queryArgs = array(
