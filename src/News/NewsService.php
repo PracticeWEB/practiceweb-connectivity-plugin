@@ -176,6 +176,8 @@ class NewsService extends ServiceAbstract
                     wp_schedule_single_event(time(), 'practiceweb_feed_fetch', array($feedLinkId));
                 }
             }
+            $messageKey = get_current_user_id() . '_pwnews';
+            set_transient($messageKey, 'Updated News configuration.');
             wp_redirect(admin_url('admin.php?page=news-configuration'));
         } else {
             wp_die('Action not permitted.', 403);
@@ -243,5 +245,22 @@ class NewsService extends ServiceAbstract
         );
         $query = new \WP_Query($queryArgs);
         return $query;
+    }
+
+    /**
+     * Helper to use transients as admin notices.
+     */
+    public function showAdminNotices()
+    {
+        // @TODO refactor this to a common helper
+        // Get transients
+        $messageKey = get_current_user_id() . '_pwnews';
+        $message = get_transient($messageKey);
+        if ($message) {
+            delete_transient($messageKey);
+            $html = '<div class="notice notice-success is-dismissible"><p>%s</p></div>';
+            $html = sprintf($html, $message);
+            echo $html;
+        }
     }
 }
