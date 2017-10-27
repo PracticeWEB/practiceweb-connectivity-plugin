@@ -4,7 +4,7 @@
  * PracticeWEB connectivity Plugin
  *
  * @link              http://www.practiceweb.co.uk
- * @since             1.0.0
+ * @since             1.0.0-beta3
  * @package           Practiceweb_Connectivity_Plugin
  *
  * @wordpress-plugin
