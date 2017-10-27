@@ -40,15 +40,28 @@ function launch_practiceweb_connectivity_plugin()
     // Admin page is required as a core service.
     $plugin->registerService('adminpage', Sift\Practiceweb\Connectivity\AdminPage\AdminPageService::class);
 
+    // Get config
+    $config = get_option('practiceweb-connectivity-config', array());
+
+    // Force FWP for now as a background service
+    $plugin->registerService('fwp', Sift\Practiceweb\Connectivity\FeedWordPress\FeedWordPressService::class);
+
     // TODO Ideally a config file would define these.
     $serviceMap = array(
-      'fwp' =>  Sift\Practiceweb\Connectivity\FeedWordPress\FeedWordPressService::class,
+    //  'fwp' =>  Sift\Practiceweb\Connectivity\FeedWordPress\FeedWordPressService::class,
       'news' =>  Sift\Practiceweb\Connectivity\News\NewsService::class,
       'deadlines' =>  Sift\Practiceweb\Connectivity\Deadlines\DeadlinesService::class,
     );
 
+    foreach ($config['service'] as $service) {
+        if (isset($serviceMap[$service])) {
+            $plugin->registerService($service, $serviceMap[$service]);
+        }
+    }
+
     foreach ($serviceMap as $key =>$class) {
-        $plugin->registerService($key, $class);
+        //if (isset($config['service'][$key] == $key)
+        //$plugin->registerService($key, $class);
     }
 
     $plugin->run();

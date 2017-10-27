@@ -21,6 +21,7 @@ class AdminPageService extends ServiceAbstract
     {
         $this->addAction('admin_init', 'registerSettings');
         $this->addAction('admin_menu', 'adminMenu');
+        $this->addAction('update_option_practiceweb-connectivity-config', 'processUpdate');
     }
 
     /**
@@ -31,7 +32,9 @@ class AdminPageService extends ServiceAbstract
         register_setting(
             'practiceweb-connectivity-group',
             'practiceweb-connectivity-config',
-            array($this, 'sanitizeInput')
+            array(
+                'sanitize_callback' => array($this, 'sanitizeInput')
+            )
         );
     }
 
@@ -57,7 +60,13 @@ class AdminPageService extends ServiceAbstract
     public function adminOptionsPage()
     {
         $vars = array();
-        $vars['practiceweb-connectivity-config'] = get_option('practiceweb-connectivity-config');
+        $vars['practiceweb-connectivity-config'] = get_option('practiceweb-connectivity-config', array());
+
+        // Get options
+        foreach ($vars['practiceweb-connectivity-config']['service'] as $key => $value) {
+            $vars['checked'][$key] = 'checked';
+        }
+
         $this->renderTemplate('adminpage/core-settings-page', $vars);
         // Call a custom hook for extending the options.
         do_action('practiceweb_connectivity_admin_options');
@@ -76,5 +85,13 @@ class AdminPageService extends ServiceAbstract
     {
         $input['apiKey'] = sanitize_text_field($input['apiKey']);
         return $input;
+    }
+
+    public function processUpdate(array $old = array(), array $new = array())
+    {
+        if (array_diff($old['service'], $new['service'])) {
+            // If services have changed then ensure that the rewrite rules update for post types.
+            flush_rewrite_rules();
+        }
     }
 }
