@@ -22,7 +22,6 @@ class NewsService extends ServiceAbstract
     {
         $this->addAction('practiceweb_connectivity_admin_menu', 'adminPageMenu');
         $this->addAction('admin_post_practiceweb_connectivity_news_setup', 'setupPageSubmit');
-        $this->addAction('et_builder_ready', 'registerDiviModules');
     }
 
     public function createPostTypes()
@@ -182,69 +181,6 @@ class NewsService extends ServiceAbstract
         } else {
             wp_die('Action not permitted.', 403);
         }
-    }
-
-    /**
-     * Register divi Modules.
-     */
-    public function registerDiviModules()
-    {
-        new PracticewebNewsModule();
-        new PracticewebNewsPortfolio();
-    }
-
-    /**
-     * Add shortcodes.
-     */
-    public function addShortcodes()
-    {
-        add_shortcode('practiceweb-news', array($this, 'newsShortcode'));
-    }
-
-    /**
-     * Simple news shortcode.
-     *
-     * @param array $atts
-     *   Shortcode attributes array.
-     */
-    public function newsShortcode($atts = array())
-    {
-        $query = $this->newsQuery();
-        global $post;
-        $this->renderTemplate('news/list-header');
-        while ($query->have_posts()) {
-            $query->the_post();
-            $renderArgs = array(
-                'post' => $post,
-            );
-            $this->renderTemplate('news/list-item', $renderArgs);
-        }
-        wp_reset_query();
-        $footerArgs = array(
-            // TODO generate paging.
-         //   'pagination' => news_pagination(array('paged => '));
-        );
-        $this->renderTemplate('news/list-footer', $footerArgs);
-    }
-
-    /**
-     * Helper to create a wordpress query.
-     *
-     * @return \WP_Query
-     *   Wordpress query object.
-     */
-    public function newsQuery()
-    {
-        $queryArgs = array(
-            'post_type' => 'news',
-            'post_status' => array('publish'),
-            'orderby' => 'date',
-            'order' => 'DESC',
-            'posts_per_page' => 10,
-            'paged' => 1
-        );
-        $query = new \WP_Query($queryArgs);
-        return $query;
     }
 
     /**
