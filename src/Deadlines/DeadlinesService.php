@@ -45,10 +45,10 @@ class DeadlinesService extends ServiceAbstract
             'supports' => array('title', 'editor', 'excerpt', 'custom-fields'),
         );
         $taxonomyNames = array(
-            'taxonomy_name' => 'PracticeWEBContent',
-            'singular' => 'PracticeWEB Category',
-            'plural' => 'PracticeWEB Categories',
-            'slug' => 'practiceweb-taxonomy',
+            'taxonomy_name' => 'PracticeWEBDeadlines',
+            'singular' => 'PracticeWEB Deadlines Category',
+            'plural' => 'PracticeWEB Deadlines Categories',
+            'slug' => 'practiceweb-deadlines-taxonomy',
         );
         $taxonomyOptions = array();
 
@@ -162,7 +162,7 @@ class DeadlinesService extends ServiceAbstract
             $postId = wp_insert_post($postInfo);
             if ($postId) {
                 // Use wp_set_object_terms so that we can create new terms on demand.
-                wp_set_object_terms($postId, $terms, 'PracticeWEBContent');
+                wp_set_object_terms($postId, $terms, 'PracticeWEBDeadlines');
             }
         }
         fclose($handle);
