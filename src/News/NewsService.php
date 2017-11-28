@@ -36,10 +36,10 @@ class NewsService extends ServiceAbstract
             'has_archive' => true,
         );
         $taxonomyNames = array(
-            'taxonomy_name' => 'PracticeWEBContent',
-            'singular' => 'PracticeWEB Category',
-            'plural' => 'PracticeWEB Categories',
-            'slug' => 'practiceweb-taxonomy',
+            'taxonomy_name' => 'PracticeWEBNews',
+            'singular' => 'PracticeWEB News Category',
+            'plural' => 'PracticeWEB News Categories',
+            'slug' => 'practiceweb-news-taxonomy',
         );
         $taxonomyOptions = array(
 
@@ -93,9 +93,9 @@ class NewsService extends ServiceAbstract
                 ),
             ),
             // Category settings.
-            'add/PracticeWEBContent' => 'yes',
-            'unfamiliar category' => 'create:PracticeWEBContent',
-            'match/cats' => array('PracticeWEBContent'),
+            'add/PracticeWEBNews' => 'yes',
+            'unfamiliar category' => 'create:PracticeWEBNews',
+            'match/cats' => array('PracticeWEBNews'),
             // Add Key.
             'practiceweb apiKey' => 'yes'
         );
