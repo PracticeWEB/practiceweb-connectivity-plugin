@@ -4,14 +4,14 @@
  * PracticeWEB connectivity Plugin
  *
  * @link              http://www.practiceweb.co.uk
- * @since             1.0.0-beta3
+ * @since             1.0.0
  * @package           Practiceweb_Connectivity_Plugin
  *
  * @wordpress-plugin
  * Plugin Name:       PracticeWEB Connectivity Plugin
  * Plugin URI:        www.practiceweb.co.uk
  * Description:       Connectivity features from PracticeWEB.
- * Version:           1.0.0
+ * Version:           1.0.0-beta.4
  * Author:            David Robinson
  * Author URI:        http://practiceweb.co.uk
  * License:           GPL-2.0+
