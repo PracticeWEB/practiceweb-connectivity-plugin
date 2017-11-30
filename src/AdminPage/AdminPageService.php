@@ -63,8 +63,10 @@ class AdminPageService extends ServiceAbstract
         $vars['practiceweb-connectivity-config'] = get_option('practiceweb-connectivity-config', array());
 
         // Get options
-        foreach ($vars['practiceweb-connectivity-config']['service'] as $key => $value) {
-            $vars['checked'][$key] = 'checked';
+        if (!empty($vars['practiceweb-connectivity-config']['service'])) {
+            foreach ($vars['practiceweb-connectivity-config']['service'] as $key => $value) {
+                $vars['checked'][$key] = 'checked';
+            }
         }
 
         $this->renderTemplate('adminpage/core-settings-page', $vars);

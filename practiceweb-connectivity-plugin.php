@@ -48,20 +48,16 @@ function launch_practiceweb_connectivity_plugin()
 
     // TODO Ideally a config file would define these.
     $serviceMap = array(
-    //  'fwp' =>  Sift\Practiceweb\Connectivity\FeedWordPress\FeedWordPressService::class,
       'news' =>  Sift\Practiceweb\Connectivity\News\NewsService::class,
       'deadlines' =>  Sift\Practiceweb\Connectivity\Deadlines\DeadlinesService::class,
     );
 
-    foreach ($config['service'] as $service) {
-        if (isset($serviceMap[$service])) {
-            $plugin->registerService($service, $serviceMap[$service]);
+    if (!empty($config['service'])) {
+        foreach ($config['service'] as $service) {
+            if (isset($serviceMap[$service])) {
+                $plugin->registerService($service, $serviceMap[$service]);
+            }
         }
-    }
-
-    foreach ($serviceMap as $key =>$class) {
-        //if (isset($config['service'][$key] == $key)
-        //$plugin->registerService($key, $class);
     }
 
     $plugin->run();
