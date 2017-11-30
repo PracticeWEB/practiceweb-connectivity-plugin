@@ -138,7 +138,10 @@ class DeadlinesService extends ServiceAbstract
         $header = fgetcsv($handle);
         while ($row = fgetcsv($handle)) {
             list($title, $uuid, $deadlineDate, $content, $teaser, $termsString, $guid) = $row;
-            $terms = array_unique(array_map('trim', explode(',', $termsString)));
+            // Split the terms string into actual taxonomy terms.
+            $termSeparator = '::';
+            $termRegex = '/' . preg_quote($termSeparator) . '/';
+            $terms = array_unique(array_map('trim', preg_split($termRegex, $termsString)));
             $postInfo = array(
                 'post_type' => 'deadlines',
                 'post_title' => $title,
