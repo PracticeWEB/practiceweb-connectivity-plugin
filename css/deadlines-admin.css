@@ -1,11 +1,15 @@
-input[type="radio"]:checked ~ .radio-reveal {
-    opacity: 1;
-    max-height: 100px;
-    overflow: visible;
-}
-
-.radio-reveal {
+/* ==========================================================================
+   Control form element visibility based on a radio button.
+   ========================================================================== */
+/* pwconn-radioreveal-target is hidden by default. */
+.pwconn-radioreveal-group .pwconn-radioreveal-target {
     opacity: 0;
     max-height: 0;
     overflow: hidden;
+}
+/* Toggle behaviour if the sibling radio is checked the target is revealed */
+.pwconn-radioreveal-group input.pwconn-radioreveal-toggle[type="radio"]:checked ~ .pwconn-radioreveal-target {
+    opacity: 1;
+    max-height: 100px;
+    overflow: visible;
 }

@@ -4,22 +4,22 @@
 
     <h3>Choose method:</h3>
     <div>
+        <fieldset class="pwconn-radioreveal-group">
+            <label for="loadMethod-upload">Upload deadlines</label>
+            <input class="pwconn-radioreveal-toggle" type="radio" name="loadMethod" value="upload" id="loadMethod-upload">
+            <div class="pwconn-radioreveal-target">
+                <label for="deadlinesfile">File: </label><input type="file" name="deadlinesfile">
+            </div>
+        </fieldset>
 
-    <fieldset>
-        <label for="loadMethod-upload">Upload deadlines</label>
-        <input type="radio" name="loadMethod" value="upload" id="loadMethod-upload">
-        <div class="radio-reveal">
-            <label for="deadlinesfile">File: </label><input type="file" name="deadlinesfile">
-        </div>
-    </fieldset>
-
-    <fieldset>
-        <label for="loadMethod-download">Download deadlines</label>
-        <input type="radio" name="loadMethod" value="download" id="loadMethod-download">
-        <div class="radio-reveal">
-            <label for="url">Url: </label><input type="text" name="url">
-        </div>
-    </fieldset>
-    <input type="hidden" name="action" value="practiceweb_connectivity_deadlines_upload">
-    <?php submit_button(); ?>
+        <fieldset class="pwconn-radioreveal-group">
+            <label for="loadMethod-download">Download deadlines</label>
+            <input class="pwconn-radioreveal-toggle" type="radio" name="loadMethod" value="download" id="loadMethod-download">
+            <div class="pwconn-radioreveal-target">
+                <label for="url">Url: </label><input type="text" name="url">
+            </div>
+        </fieldset>
+        <input type="hidden" name="action" value="practiceweb_connectivity_deadlines_upload">
+        <?php submit_button(); ?>
+    </div>
 </form>
