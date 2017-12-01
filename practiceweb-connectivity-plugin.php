@@ -11,7 +11,7 @@
  * Plugin Name:       PracticeWEB Connectivity Plugin
  * Plugin URI:        www.practiceweb.co.uk
  * Description:       Connectivity features from PracticeWEB.
- * Version:           1.0.0-beta.5
+ * Version:           1.0.0-beta.6
  * Author:            David Robinson
  * Author URI:        http://practiceweb.co.uk
  * License:           GPL-2.0+
